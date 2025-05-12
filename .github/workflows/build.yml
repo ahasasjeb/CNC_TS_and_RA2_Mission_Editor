@@ -1,0 +1,39 @@
+# .github/workflows/build.yml
+name: Build FinalSun & FinalAlert2
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Visual Studio 2022
+    - name: Setup Visual Studio 2022
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.x'
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        choco install visualstudio2022buildtools
+        choco install git
+
+    # Step 4: Build the project
+    - name: Build FinalAlertYRRelease
+      run: |
+        "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" MissionEditor.sln /p:Configuration=FinalAlertYRRelease
+
+    # Step 5: Verify build output
+    - name: Verify build output
+      run: |
+        if not exist "dist/FinalAlert2YR/FinalAlert2YR.exe" exit 1
